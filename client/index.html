@@ -1,0 +1,59 @@
+<head>
+  <meta charset="utf-8" />
+  <script src="https://js.braintreegateway.com/web/dropin/1.39.0/js/dropin.min.js"></script>
+  <script src="https://js.braintreegateway.com/web/3.87.0/js/client.min.js"></script>
+    <script src="https://js.braintreegateway.com/web/3.87.0/js/data-collector.min.js"></script>
+</head>
+<body>
+  <form id="payment-form" action="http://localhost:3000/checkout" method="post">
+    <!-- Putting the empty container you plan to pass to
+      'braintree.dropin.create' inside a form will make layout and flow
+      easier to manage -->
+    <div id="dropin-container"></div>
+    <input type="submit" />
+    <input type="hidden" id="nonce" name="payment_method_nonce" />
+    <input type="hidden" id="deviceData" name="deviceData" />
+  </form>
+
+  <script type="text/javascript">
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://localhost:3000/client_token");
+        xhttp.onload = function(){
+            const form = document.getElementById('payment-form');
+                braintree.dropin.create({
+                authorization:  xhttp.responseText,
+                container: '#dropin-container'
+                }, (error, dropinInstance) => {
+                    if (error) console.error(error);
+
+                    braintree.dataCollector.create({
+                        client: dropinInstance
+                    }, function (err, dataCollectorInstance) {
+                        if (err) {
+                        // Handle error in creation of data collector
+                        return;
+                        }
+                        // At this point, you should access the dataCollectorInstance.deviceData value and provide it
+                        // to your server, e.g. by injecting it into your form as a hidden input.
+                        var deviceData = dataCollectorInstance.deviceData;
+                        document.getElementById('deviceData').value = deviceData;
+                    });
+
+                    form.addEventListener('submit', event => {
+                        event.preventDefault();
+
+                        dropinInstance.requestPaymentMethod((error, payload) => {
+                            if (error) console.error(error);
+                            document.getElementById('nonce').value = payload.nonce;
+                            form.submit();
+                        });
+                    });
+            });
+        }
+        xhttp.send();
+
+        
+
+        
+  </script>
+</body>

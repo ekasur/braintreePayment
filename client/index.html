@@ -10,9 +10,12 @@
       'braintree.dropin.create' inside a form will make layout and flow
       easier to manage -->
     <div id="dropin-container"></div>
-    <input type="submit" />
-    <input type="hidden" id="nonce" name="payment_method_nonce" />
+
+    <input type="hidden" id="nonce" name="payment_method_nonce" value="fake-valid-nonce" />
     <input type="hidden" id="deviceData" name="deviceData" />
+    
+    <input type="submit" />
+    
   </form>
 
   <script type="text/javascript">
@@ -28,16 +31,16 @@
 
                     braintree.dataCollector.create({
                         client: dropinInstance
-                    }, function (err, dataCollectorInstance) {
-                        if (err) {
-                        // Handle error in creation of data collector
-                        return;
-                        }
-                        // At this point, you should access the dataCollectorInstance.deviceData value and provide it
-                        // to your server, e.g. by injecting it into your form as a hidden input.
-                        var deviceData = dataCollectorInstance.deviceData;
-                        document.getElementById('deviceData').value = deviceData;
-                    });
+                        }, function (err, dataCollectorInstance) {
+                            if (err) {
+                            // Handle error in creation of data collector
+                              return;
+                            }
+                            var deviceData = dataCollectorInstance.deviceData;
+
+                            console.log(deviceData);
+                            document.getElementById('deviceData').value = deviceData;
+                        });
 
                     form.addEventListener('submit', event => {
                         event.preventDefault();
@@ -45,7 +48,8 @@
                         dropinInstance.requestPaymentMethod((error, payload) => {
                             if (error) console.error(error);
                             document.getElementById('nonce').value = payload.nonce;
-                            form.submit();
+                            console.log(payload.nonce);
+                            //form.submit();
                         });
                     });
             });

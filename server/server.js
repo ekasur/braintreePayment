@@ -1,9 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const port = 3000;
-require("dotenv").config()
+const bodyParser = require('body-parser');
+require("dotenv").config();
 const braintree = require("braintree");
-const bodyParser = require('body-parser')
+
 const app = express();
 
 app.use(cors());
@@ -25,11 +26,13 @@ app.get("/client_token", (req, res) => {
 });
 
 app.post("/checkout", (req, res) => {
+    console.log(req.body);
+
     const nonceFromTheClient = req.body.payment_method_nonce;
     const deviceDataFromTheClient = req.body.deviceData;
     // Use payment method nonce here
     gateway.transaction.sale({
-        amount: "10.00",
+        amount: "11.00",
         paymentMethodNonce: nonceFromTheClient,
         deviceData: deviceDataFromTheClient,
         options: {
@@ -42,6 +45,10 @@ app.post("/checkout", (req, res) => {
         res.send(result);
       });
 });
+
+app.get('/', (req, res)=>{
+  res.send('braintree payment....')
+})
 
 app.listen(port, ()=>{
     console.log('Server listen on port '+port);

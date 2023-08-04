@@ -133,7 +133,7 @@
         }
 
         const xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "http://47.241.24.78:3131/client_token");
+        xhttp.open("GET", "https://test.devnodejs.com/client_token");
         xhttp.onload = function(){
             const authtoken = xhttp.responseText;
             console.log(authtoken);
